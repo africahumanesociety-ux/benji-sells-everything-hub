@@ -74,7 +74,7 @@ const MOCK_ORDERS: Order[] = [
 ];
 
 const ADMIN_PASSWORD_KEY = "benji_admin_auth";
-const ADMIN_PASSWORD = "benji2024";
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD ?? "benji2024";
 
 const CATEGORY_COLORS: Record<string, string> = {
   electronics:  "hsl(218,92%,56%)",
@@ -85,31 +85,27 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function buildWeeklyRevenue(orders: Order[]) {
-  const weeks: Record<string, number> = {};
   const now = Date.now();
+  // Build 12 weekly buckets anchored to real timestamps
+  const buckets: Array<{ label: string; anchorMs: number; revenue: number }> = [];
   for (let i = 11; i >= 0; i--) {
-    const d = new Date(now - i * 7 * 86400000);
-    const label = d.toLocaleDateString("en-NG", { month: "short", day: "numeric" });
-    weeks[label] = 0;
+    const anchorMs = now - i * 7 * 86400000;
+    const label = new Date(anchorMs).toLocaleDateString("en-NG", { month: "short", day: "numeric" });
+    buckets.push({ label, anchorMs, revenue: 0 });
   }
   for (const o of orders) {
     if (o.status === "cancelled" || o.status === "refunded") continue;
-    const d = new Date(o.created_at);
-    // Find the closest week label (bucket into the nearest Sunday)
-    const weekStart = new Date(d);
-    weekStart.setDate(d.getDate() - d.getDay());
-    // Find matching week slot (approximate — within 7 days of a key)
-    const keys = Object.keys(weeks);
-    let closest = keys[0];
+    const orderMs = new Date(o.created_at).getTime();
+    // Find the bucket whose anchor is closest in time
+    let closest = buckets[0];
     let minDiff = Infinity;
-    for (const k of keys) {
-      const kDate = new Date(k + ", 2025");
-      const diff = Math.abs(kDate.getTime() - d.getTime());
-      if (diff < minDiff) { minDiff = diff; closest = k; }
+    for (const b of buckets) {
+      const diff = Math.abs(b.anchorMs - orderMs);
+      if (diff < minDiff) { minDiff = diff; closest = b; }
     }
-    weeks[closest] += o.amount * o.quantity;
+    closest.revenue += o.amount * o.quantity;
   }
-  return Object.entries(weeks).map(([week, revenue]) => ({ week, revenue }));
+  return buckets.map(({ label, revenue }) => ({ week: label, revenue }));
 }
 
 function buildCategoryBreakdown(orders: Order[]) {

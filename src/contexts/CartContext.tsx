@@ -136,7 +136,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         .from("cart_items")
         .delete()
         .eq("session_id", sessionId.current)
-        .not("product_id", "in", `(${activeIds.join(",")})`)
+        .not("product_id", "in", activeIds)
         .catch(() => {});
     };
 
