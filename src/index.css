@@ -102,7 +102,8 @@
   [role="button"]:focus-visible {
     outline: 2px solid hsl(var(--ring));
     outline-offset: 2px;
-    border-radius: 0.5rem;
+    box-shadow: 0 0 0 4px hsl(var(--background));
+    border-radius: inherit;
   }
 }
 
@@ -217,9 +218,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    animation: none !important;
+    transition: none !important;
     scroll-behavior: auto !important;
   }
 }
