@@ -14,7 +14,82 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cart_items: {
+        Row: {
+          id: string
+          session_id: string
+          product_id: number
+          product_name: string
+          price_num: number
+          price_str: string
+          img_url: string
+          quantity: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          session_id: string
+          product_id: number
+          product_name: string
+          price_num: number
+          price_str: string
+          img_url: string
+          quantity: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          session_id?: string
+          product_id?: number
+          product_name?: string
+          price_num?: number
+          price_str?: string
+          img_url?: string
+          quantity?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      orders: {
+        Row: {
+          id: string
+          order_number: string
+          customer_name: string
+          customer_email: string | null
+          product_name: string
+          category: string
+          amount: number
+          quantity: number
+          status: 'completed' | 'pending' | 'cancelled' | 'refunded'
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          order_number: string
+          customer_name: string
+          customer_email?: string | null
+          product_name: string
+          category: string
+          amount: number
+          quantity?: number
+          status?: 'completed' | 'pending' | 'cancelled' | 'refunded'
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          order_number?: string
+          customer_name?: string
+          customer_email?: string | null
+          product_name?: string
+          category?: string
+          amount?: number
+          quantity?: number
+          status?: 'completed' | 'pending' | 'cancelled' | 'refunded'
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
