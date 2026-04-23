@@ -3,6 +3,7 @@ import { ShoppingCart, Smartphone, Shirt, Home, Watch, Sparkles, Loader2, Packag
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import { useShopifyCartStore } from "@/stores/shopifyCartStore";
+import { useCart } from "@/contexts/CartContext";
 import { storefrontApiRequest, STOREFRONT_PRODUCTS_QUERY, ShopifyProduct } from "@/lib/shopify";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -85,6 +86,7 @@ const Store = () => {
   const [hasShopifyProducts, setHasShopifyProducts] = useState(false);
   const addItem = useShopifyCartStore((s) => s.addItem);
   const isCartLoading = useShopifyCartStore((s) => s.isLoading);
+  const { addItem: addLocalItem } = useCart();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -280,7 +282,13 @@ const Store = () => {
                   <div className="p-5">
                     <h3 className="font-semibold mb-1">{p.name}</h3>
                     <p className="font-heading text-2xl text-primary mb-4">{p.price}</p>
-                    <p className="text-xs text-muted-foreground">Contact to purchase</p>
+                    <Button
+                      className="w-full gold-gradient text-primary-foreground hover:opacity-90"
+                      onClick={() => addLocalItem({ id: p.id, name: p.name, price: p.price, priceNum: p.priceNum, img: p.img })}
+                    >
+                      <ShoppingCart size={16} className="mr-2" />
+                      Add to Cart
+                    </Button>
                   </div>
                 </div>
               </motion.div>

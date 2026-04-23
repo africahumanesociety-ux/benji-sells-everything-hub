@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ShoppingBag } from "lucide-react";
+import { Menu, X, ShoppingBag, Search } from "lucide-react";
 import { useShopifyCartStore } from "@/stores/shopifyCartStore";
+import { useCart } from "@/contexts/CartContext";
 import benjiLogo from "@/assets/benji-logo.jpeg";
 
 const navLinks = [
@@ -10,6 +11,7 @@ const navLinks = [
   { label: "Digital", to: "/digital-services" },
   { label: "Media", to: "/media" },
   { label: "Store", to: "/store" },
+  { label: "Search", to: "/search" },
   { label: "Contact", to: "/contact" },
 ];
 
@@ -17,8 +19,10 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const totalItems = useShopifyCartStore((s) => s.totalItems)();
-  const openCart = (v: boolean) => useShopifyCartStore.getState().setIsOpen(v);
+  const shopifyTotalItems = useShopifyCartStore((s) => s.totalItems)();
+  const { totalItems: localTotalItems, setIsOpen: openLocalCart } = useCart();
+  const totalItems = shopifyTotalItems + localTotalItems;
+  const openShopifyCart = (v: boolean) => useShopifyCartStore.getState().setIsOpen(v);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -85,8 +89,21 @@ const Navbar = () => {
 
           {/* Right cluster */}
           <div className="flex items-center gap-2 pr-1">
+            <Link
+              to="/search"
+              aria-label="Search products"
+              className="relative h-10 w-10 rounded-full flex items-center justify-center text-foreground/80 hover:text-primary hover:bg-muted transition-colors"
+            >
+              <Search size={18} />
+            </Link>
             <button
-              onClick={() => openCart(true)}
+              onClick={() => {
+                if (localTotalItems > 0) {
+                  openLocalCart(true);
+                } else {
+                  openShopifyCart(true);
+                }
+              }}
               aria-label="Open cart"
               className="relative h-10 w-10 rounded-full flex items-center justify-center text-foreground/80 hover:text-primary hover:bg-muted transition-colors"
             >
